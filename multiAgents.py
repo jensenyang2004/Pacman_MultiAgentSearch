@@ -4,13 +4,12 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
 
 from util import manhattanDistance
 from game import Directions
@@ -19,8 +18,9 @@ import random, util
 from game import Agent
 from pacman import GameState
 
+
 class ReflexAgent(Agent):
-    """
+  """
     A reflex agent chooses an action at each choice point by examining
     its alternatives via a state evaluation function.
 
@@ -29,9 +29,8 @@ class ReflexAgent(Agent):
     headers.
     """
 
-
-    def getAction(self, gameState: GameState):
-        """
+  def getAction(self, gameState: GameState):
+    """
         You do not need to change this method, but you're welcome to.
 
         getAction chooses among the best options according to the evaluation function.
@@ -39,21 +38,24 @@ class ReflexAgent(Agent):
         Just like in the previous project, getAction takes a GameState and returns
         some Directions.X for some X in the set {NORTH, SOUTH, WEST, EAST, STOP}
         """
-        # Collect legal moves and successor states
-        legalMoves = gameState.getLegalActions()
+    # Collect legal moves and successor states
+    legalMoves = gameState.getLegalActions()
 
-        # Choose one of the best actions
-        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+    # Choose one of the best actions
+    scores = [
+        self.evaluationFunction(gameState, action) for action in legalMoves
+    ]
+    bestScore = max(scores)
+    bestIndices = [
+        index for index in range(len(scores)) if scores[index] == bestScore
+    ]
+    chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
+    "Add more of your code here if you want to"
 
-        "Add more of your code here if you want to"
+    return legalMoves[chosenIndex]
 
-        return legalMoves[chosenIndex]
-
-    def evaluationFunction(self, currentGameState: GameState, action):
-        """
+  def evaluationFunction(self, currentGameState: GameState, action):
+    """
         Design a better evaluation function here.
 
         The evaluation function takes in the current and proposed successor
@@ -67,28 +69,37 @@ class ReflexAgent(Agent):
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
-        # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    # Useful information you can extract from a GameState (pacman.py)
+    successorGameState = currentGameState.generatePacmanSuccessor(action)
+    newPos = successorGameState.getPacmanPosition()
+    newFood = successorGameState.getFood()
+    newGhostStates = successorGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+    
+    "*** YOUR CODE HERE ***"
+    foodcoord = newFood.asList()
+    foodamount = newFood.count(True)
+    initialFoodAmount = currentGameState.getFood().count(True)
+
+    print(foodcoord)
+    return initialFoodAmount - foodamount
+    # return successorGameState.getScore()
+
 
 def scoreEvaluationFunction(currentGameState: GameState):
-    """
+  """
     This default evaluation function just returns the score of the state.
     The score is the same one displayed in the Pacman GUI.
 
     This evaluation function is meant for use with adversarial search agents
     (not reflex agents).
     """
-    return currentGameState.getScore()
+  return currentGameState.getScore()
+
 
 class MultiAgentSearchAgent(Agent):
-    """
+  """
     This class provides some common elements to all of your
     multi-agent searchers.  Any methods defined here will be available
     to the MinimaxPacmanAgent, AlphaBetaPacmanAgent & ExpectimaxPacmanAgent.
@@ -102,18 +113,19 @@ class MultiAgentSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
-        self.index = 0 # Pacman is always agent index 0
-        self.evaluationFunction = util.lookup(evalFn, globals())
-        self.depth = int(depth)
+  def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    self.index = 0  # Pacman is always agent index 0
+    self.evaluationFunction = util.lookup(evalFn, globals())
+    self.depth = int(depth)
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
-    """
+  """
     Your minimax agent (question 2)
     """
 
-    def getAction(self, gameState: GameState):
-        """
+  def getAction(self, gameState: GameState):
+    """
         Returns the minimax action from the current gameState using self.depth
         and self.evaluationFunction.
 
@@ -135,45 +147,49 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    "*** YOUR CODE HERE ***"
+    util.raiseNotDefined()
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
-    """
+  """
     Your minimax agent with alpha-beta pruning (question 3)
     """
 
-    def getAction(self, gameState: GameState):
-        """
+  def getAction(self, gameState: GameState):
+    """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    "*** YOUR CODE HERE ***"
+    util.raiseNotDefined()
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
-    """
+  """
       Your expectimax agent (question 4)
     """
 
-    def getAction(self, gameState: GameState):
-        """
+  def getAction(self, gameState: GameState):
+    """
         Returns the expectimax action using self.depth and self.evaluationFunction
 
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    "*** YOUR CODE HERE ***"
+    util.raiseNotDefined()
+
 
 def betterEvaluationFunction(currentGameState: GameState):
-    """
+  """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+  "*** YOUR CODE HERE ***"
+  util.raiseNotDefined()
+
 
 # Abbreviation
 better = betterEvaluationFunction
