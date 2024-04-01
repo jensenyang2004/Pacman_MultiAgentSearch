@@ -77,16 +77,11 @@ class ReflexAgent(Agent):
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
     
-    "*** YOUR CODE HERE ***"
-    # if(successorGameState.getPacmanState().getDirection() == "stop"):
-      # return -1000
-    
-    
+    "*** YOUR CODE HERE ***"    
     foodcoord = newFood.asList()
     foodamount = newFood.count(True)
     initialFoodAmount = currentGameState.getFood().count(True)
 
-    # print(currentGameState.getPacmanState().getDirection())
     distancesFromFood = 0
     i = 1
         
@@ -106,11 +101,6 @@ class ReflexAgent(Agent):
       if ghostDistances == manhattanDistance(newPos, ghost.getPosition()):
         scaredTime = ghost.scaredTimer
 
-    
-    # if(ghost.scaredTimer < ghostDistances):
-    #   score += ghostDistances*8
-    # else:
-    #   score -= ghostDistances*8
     if(ghostDistances - scaredTime <= 1):
       return -1000
     score += (ghostDistances - scaredTime)*3
@@ -157,6 +147,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+  def minimax(self, currentGameState: GameState, depth, agentIndex, action = None):
+    GhostNum = currentGameState.getNumAgents() - 1
+    actions = currentGameState.getLegalActions(agentIndex)
+    if(depth == self.depth - 1 and agentIndex == GhostNum):
+      return self.evaluationFunction(currentGameState), action
+    print(currentGameState)
+    print(actions)
+    finalAction = action
+    minimax = 0
+      
+    for oneAction in actions:
+      if(agentIndex == 0):
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        score, minimaxAction = self.minimax(successorGameState, depth + 1, agentIndex + 1, oneAction)
+        if(score > minimax):
+          minimax = score
+          finalAction = oneAction
+      else:
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        if(agentIndex == GhostNum):
+          agentIndex = -1 
+        score, minimaxAction = self.minimax(successorGameState, depth, agentIndex + 1, oneAction)
+        if(score <= minimax):
+          minimax = score
+          finalAction = oneAction
+    return minimax, finalAction
+
   def getAction(self, gameState: GameState):
     """
         Returns the minimax action from the current gameState using self.depth
@@ -181,7 +198,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # gameState.getGhostStates()
+    mini, action = self.minimax(gameState, 0, 0)
+    if action == None:
+      return "Stop"
+    # util.raiseNotDefined()
+    return action
+
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
