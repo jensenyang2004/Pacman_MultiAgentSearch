@@ -78,6 +78,10 @@ class ReflexAgent(Agent):
 
     
     "*** YOUR CODE HERE ***"
+    # if(successorGameState.getPacmanState().getDirection() == "stop"):
+      # return -1000
+    
+    
     foodcoord = newFood.asList()
     foodamount = newFood.count(True)
     initialFoodAmount = currentGameState.getFood().count(True)
@@ -90,19 +94,30 @@ class ReflexAgent(Agent):
     score = 0
     for food in foodcoord:
      ShortestDistances = min(manhattanDistance(food, newPos), ShortestDistances)
-    
-    score -= ShortestDistances*2
+    if ShortestDistances == 100000000:
+      ShortestDistances = 0
+    score -= ShortestDistances*5
     score += successorGameState.getScore()
-    score += (currentGameState.getNumFood() - successorGameState.getNumFood())*10
+    score += (currentGameState.getNumFood() - successorGameState.getNumFood())*100
     ghostDistances = 10000000
+    scaredTime = 0
     for ghost in newGhostStates:
       ghostDistances = min(manhattanDistance(newPos, ghost.getPosition()), ghostDistances)
-    score += ghostDistances*5
+      if ghostDistances == manhattanDistance(newPos, ghost.getPosition()):
+        scaredTime = ghost.scaredTimer
+
     
+    # if(ghost.scaredTimer < ghostDistances):
+    #   score += ghostDistances*8
+    # else:
+    #   score -= ghostDistances*8
+    if(ghostDistances - scaredTime <= 1):
+      return -1000
+    score += (ghostDistances - scaredTime)*3
+    score += (len(currentGameState.getCapsules()) - len(successorGameState.getCapsules()))*1000
+
     return score
-    
-    # return initialFoodAmount - foodamount
-    # return successorGameState.getScore()
+  
 
 
 def scoreEvaluationFunction(currentGameState: GameState):
