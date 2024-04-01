@@ -82,8 +82,22 @@ class ReflexAgent(Agent):
     foodamount = newFood.count(True)
     initialFoodAmount = currentGameState.getFood().count(True)
 
-    print(foodcoord)
-    return initialFoodAmount - foodamount
+    print(currentGameState.getPacmanState().getDirection())
+    distancesFromFood = 0
+    i = 1
+        
+    ShortestDistances = 0
+    score = 0
+    for food in foodcoord:
+     ShortestDistances = min(manhattanDistance(food, newPos), ShortestDistances)
+    
+    score -= ShortestDistances
+    score += successorGameState.getScore()
+    score += (currentGameState.getNumFood() - successorGameState.getNumFood())
+    
+    return score
+    
+    # return initialFoodAmount - foodamount
     # return successorGameState.getScore()
 
 
