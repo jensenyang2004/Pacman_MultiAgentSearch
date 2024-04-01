@@ -147,28 +147,32 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
-  def minimax(self, currentGameState: GameState, depth, agentIndex, action = None):
+  def minimax(self, currentGameState: GameState, depth, agentIndex, action = "Stop"):
     GhostNum = currentGameState.getNumAgents() - 1
     actions = currentGameState.getLegalActions(agentIndex)
-    if(depth == self.depth - 1 and agentIndex == GhostNum):
+    
+    if(depth == 0):
       return self.evaluationFunction(currentGameState), action
-    print(currentGameState)
-    print(actions)
+
+    if (currentGameState.isLose() or currentGameState.isWin()):
+      return self.evaluationFunction(currentGameState), action
+    
     finalAction = action
-    minimax = 0
-      
+    minimax = -100000
+    if(agentIndex > 0):
+      minimax = 100000
+    
     for oneAction in actions:
+      successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
       if(agentIndex == 0):
-        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
-        score, minimaxAction = self.minimax(successorGameState, depth + 1, agentIndex + 1, oneAction)
+        score, minimaxAction = self.minimax(successorGameState, depth - 1, agentIndex + 1, oneAction)
         if(score > minimax):
           minimax = score
           finalAction = oneAction
       else:
-        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
         if(agentIndex == GhostNum):
           agentIndex = -1 
-        score, minimaxAction = self.minimax(successorGameState, depth, agentIndex + 1, oneAction)
+        score, minimaxAction = self.minimax(successorGameState, depth - 1, agentIndex + 1, oneAction)
         if(score <= minimax):
           minimax = score
           finalAction = oneAction
@@ -198,11 +202,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
     "*** YOUR CODE HERE ***"
-    # gameState.getGhostStates()
-    mini, action = self.minimax(gameState, 0, 0)
-    if action == None:
-      return "Stop"
-    # util.raiseNotDefined()
+    trueDepth = gameState.getNumAgents()*self.depth
+    mini, action = self.minimax(gameState, trueDepth, 0)
     return action
 
 
