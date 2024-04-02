@@ -273,6 +273,32 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
+  def Expectimax(self, currentGameState: GameState, depth, agentIndex):
+
+    actions = currentGameState.getLegalActions(agentIndex)
+    NumAgents = currentGameState.getNumAgents()
+  
+    if (depth == 0) or currentGameState.isLose() or currentGameState.isWin():
+      score = self.evaluationFunction(currentGameState)
+      return score
+  
+    minimax = -1e308
+    if(agentIndex > 0):
+      minimax = 0
+  
+    if(agentIndex == 0):
+      for oneAction in actions:
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        score = self.Expectimax(successorGameState, depth - 1, agentIndex + 1)
+        minimax = max(score, minimax)
+    else:
+      
+      for oneAction in actions:
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        minimax += self.Expectimax(successorGameState, depth - 1, (agentIndex + 1)%NumAgents)
+      minimax /= len(actions)
+    return minimax
+
   def getAction(self, gameState: GameState):
     """
         Returns the expectimax action using self.depth and self.evaluationFunction
@@ -281,6 +307,16 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
     "*** YOUR CODE HERE ***"
+    trueDepth = gameState.getNumAgents()*self.depth
+    actions = gameState.getLegalActions(0)
+    valuation, finalAction =  -1e308, "Stop"
+    for action in actions:
+      successor = gameState.generateSuccessor(0, action)
+      score = self.Expectimax(successor, trueDepth - 1, 1)
+      if score > valuation: 
+        valuation = score
+        finalAction = action
+    return finalAction
     util.raiseNotDefined()
 
 
