@@ -14,7 +14,7 @@
 
 # imports from python standard library
 import grading
-import imp
+import importlib
 import optparse
 import os
 import pprint
@@ -120,25 +120,8 @@ def setModuleName(module, filename):
             # TODO: assign member __file__'s?
         # print i, type(o)
 
-
-#from cStringIO import StringIO
-
-def loadModuleString(moduleSource):
-    # Below broken, imp doesn't believe its being passed a file:
-    #    ValueError: load_module arg#2 should be a file or None
-    #
-    #f = StringIO(moduleCodeDict[k])
-    #tmp = imp.load_module(k, f, k, (".py", "r", imp.PY_SOURCE))
-    tmp = imp.new_module(k)
-    exec(moduleCodeDict[k], tmp.__dict__)
-    setModuleName(tmp, k)
-    return tmp
-
-
 def loadModuleFile(moduleName, filePath):
-    with open(filePath, 'r') as f:
-        return imp.load_module(moduleName, f, "%s.py" % moduleName, (".py", "r", imp.PY_SOURCE))
-
+    return importlib.import_module(moduleName, filePath)
 
 def readFile(path, root=""):
     "Read file from disk at specified path and return as string"
@@ -276,8 +259,8 @@ def evaluate(generateSolutions, testRoot, moduleDict, exceptionMap=ERROR_HINT_MA
 
         # load test cases into question
         tests = [t for t in os.listdir(
-            subdir_path) if re.match('[^#~.].*\.test\Z', t)]
-        tests = [re.match('(.*)\.test\Z', t).group(1) for t in tests]
+            subdir_path) if re.match(r'[^#~.].*\.test\Z', t)]
+        tests = [re.match(r'(.*)\.test\Z', t).group(1) for t in tests]
         for t in sorted(tests):
             test_file = os.path.join(subdir_path, '%s.test' % t)
             solution_file = os.path.join(subdir_path, '%s.solution' % t)
@@ -342,10 +325,10 @@ if __name__ == '__main__':
 
     moduleDict = {}
     for cp in codePaths:
-        moduleName = re.match('.*?([^/]*)\.py', cp).group(1)
+        moduleName = re.match(r'.*?([^/]*)\.py', cp).group(1)
         moduleDict[moduleName] = loadModuleFile(
             moduleName, os.path.join(options.codeRoot, cp))
-    moduleName = re.match('.*?([^/]*)\.py', options.testCaseCode).group(1)
+    moduleName = re.match(r'.*?([^/]*)\.py', options.testCaseCode).group(1)
     moduleDict['projectTestClasses'] = loadModuleFile(
         moduleName, os.path.join(options.codeRoot, options.testCaseCode))
 

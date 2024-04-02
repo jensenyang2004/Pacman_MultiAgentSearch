@@ -146,15 +146,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
   """
     Your minimax agent (question 2)
     """
-
   def minimax(self, currentGameState: GameState, depth, agentIndex, action = "Stop"):
     GhostNum = currentGameState.getNumAgents() - 1
     actions = currentGameState.getLegalActions(agentIndex)
     
-    if(depth == 0):
-      return self.evaluationFunction(currentGameState), action
-
-    if (currentGameState.isLose() or currentGameState.isWin()):
+    if depth == 0 or currentGameState.isLose() or currentGameState.isWin():
       return self.evaluationFunction(currentGameState), action
     
     finalAction = action
@@ -170,14 +166,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
           minimax = score
           finalAction = oneAction
       else:
-        if(agentIndex == GhostNum):
-          agentIndex = -1 
-        score, minimaxAction = self.minimax(successorGameState, depth - 1, agentIndex + 1, oneAction)
+        score, minimaxAction = self.minimax(successorGameState, depth - 1, (agentIndex + 1)%(GhostNum+1), oneAction)
         if(score <= minimax):
           minimax = score
           finalAction = oneAction
     return minimax, finalAction
 
+    
+
+      
+  # test_cases/q2/2-one-ghost-3level.test
   def getAction(self, gameState: GameState):
     """
         Returns the minimax action from the current gameState using self.depth
@@ -203,21 +201,70 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
     "*** YOUR CODE HERE ***"
     trueDepth = gameState.getNumAgents()*self.depth
-    mini, action = self.minimax(gameState, trueDepth, 0)
-    return action
-
-
+    tuple = self.minimax(gameState, trueDepth, 0)
+    return tuple[1]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
     Your minimax agent with alpha-beta pruning (question 3)
     """
+  # test_cases/q3/6-tied-root
+  def AlphaBeta(self, currentGameState: GameState, depth, agentIndex, alpha, beta):
+
+    actions = currentGameState.getLegalActions(agentIndex)
+    NumAgents = currentGameState.getNumAgents()
+
+    if (depth == 0) or currentGameState.isLose() or currentGameState.isWin():
+      score = self.evaluationFunction(currentGameState)
+      return score
+
+    minimax = -1e308
+    if(agentIndex > 0):
+      minimax = 1e308
+
+    if(agentIndex == 0):
+      for oneAction in actions:
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        score = self.AlphaBeta(successorGameState, depth - 1, agentIndex + 1, alpha, beta)
+        minimax = max(score, minimax)
+        if score > beta:
+          return score
+        alpha = max(alpha, score)
+    else:
+      for oneAction in actions:
+        successorGameState = currentGameState.generateSuccessor(agentIndex, oneAction)
+        score = self.AlphaBeta(successorGameState, depth - 1, (agentIndex + 1)%NumAgents, alpha, beta)
+        minimax = min(score, minimax)
+        if score < alpha:
+          return score
+        beta = min(beta, score)
+    return minimax
+
+
+        
+    
 
   def getAction(self, gameState: GameState):
     """
         Returns the minimax action using self.depth and self.evaluationFunction
         """
     "*** YOUR CODE HERE ***"
+
+    trueDepth = gameState.getNumAgents()*self.depth
+    actions = gameState.getLegalActions(0)
+    valuation, finalAction =  -1e308, "Stop"
+    alpha, beta = -1e308, 1e308
+    for action in actions:
+      successor = gameState.generateSuccessor(0, action)
+      score = self.AlphaBeta(successor, trueDepth - 1, 1, alpha, beta)
+      if score > valuation: 
+        valuation = score
+        finalAction = action
+      if score > beta:
+        return score
+      alpha = max(alpha, score)
+
+    return finalAction
     util.raiseNotDefined()
 
 
